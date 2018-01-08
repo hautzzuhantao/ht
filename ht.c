@@ -17,6 +17,7 @@ typedef enum
   STATION_NAME,  
   USER_NAME         	
 } Type_info;
+
 int creat_database(sqlite3 *db)
 {
 	char *errmsg=NULL;
@@ -145,22 +146,22 @@ int set_env(float val, Type_info no,sqlite3 *db)
 	switch(no)
 	{
 		case TEMPERATURE_MAX:
-		sprintf (sql, "update config_env set temperatureMax = '%f';", val);
+		sprintf (sql, "update config_env set temperatureMax = '%6.1f';", val);
 		break;
 		case TEMPERATURE_MIN:
-		sprintf (sql, "update config_env set temperatureMin = '%f';", val);
+		sprintf (sql, "update config_env set temperatureMin = '%6.1f';", val);
 		break;
 		case HUMIDITY_MAX:
-		sprintf (sql, "update config_env set humidityMax = '%f';", val);
+		sprintf (sql, "update config_env set humidityMax = '%6.1f';", val);
 		break;
 		case HUMIDITY_MIN:
-		sprintf (sql, "update config_env set humidityMin = '%f';", val);
+		sprintf (sql, "update config_env set humidityMin = '%6.1f';", val);
 		break;
 		case ILLUMINATION_MAX:
-		sprintf (sql, "update config_env set illuminationMax = '%f';", val);
+		sprintf (sql, "update config_env set illuminationMax = '%6.1f';", val);
 		break;
 		case ILLUMINATION_MIN:
-		sprintf (sql, "update config_env set illuminationMin = '%f';", val);
+		sprintf (sql, "update config_env set illuminationMin = '%6.1f';", val);
 		break;
 		
 	}
