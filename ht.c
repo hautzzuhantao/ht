@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sqlite3.h>
@@ -131,9 +132,9 @@ int display_table_env(sqlite3 *db)
 	
 }
 
-int set_env(float val, Type_info no)
+int set_env(float val, Type_info no,sqlite3 *db)
 {
-	sqlite3 *db;
+	
 	char **aresult=NULL;  
   
     int i=0;  
@@ -195,9 +196,9 @@ int main()
 	creat_table_config_env(db);
 	creat_table_collect_env(db);
     init_table_env (db); 
-    display_table_env(db);
-	//set_env(60.2,TEMPERATURE_MAX );
-	//display_table_env(db);
+    //display_table_env(db);
+	set_env(60.2,TEMPERATURE_MAX,db);
+	display_table_env(db);
 	sqlite3_close(db);
     return 0;
 }
