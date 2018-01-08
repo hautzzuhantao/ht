@@ -17,54 +17,48 @@ typedef enum
   STATION_NAME,  
   USER_NAME         	
 } Type_info;
-#if 0
-static int callback(void* arg, int f_num , char ** f_value  , char ** f_name)
+int creat_database(sqlite3 *db)
 {
-    int i = 0;
-    printf("f_num = %d \n", f_num);
-    for (i = 0; i < f_num; i++)
-    {
-        printf("%s\t", f_value[i]);
-    }
-    putchar(10);
-
-    return 0;
-}
-  #endif
-int creat_database()
-{   
-    sqlite3 *db;
+	char *errmsg=NULL;
 	int rc=0;
 	rc=sqlite3_open(DATABASE,&db);
 	if (rc != SQLITE_OK)
     {
-        sqlite3_errmsg(db);
+       printf ("Can't Open Database:%s!\n",sqlite3_errmsg(db));
+		 
+		sqlite3_close(db);
     }
     else
     {
         printf("database open success!\n");
-    }
+    }	
+	
 	
 }
 
-int creat_table_config_env()
+
+int creat_table_config_env(sqlite3 *db)
 {
-	sqlite3 *db;
+	
 	char *errmsg=NULL;
  
-	char *sql = "create table config_env(temperatureMax float not null,temperatureMin float not null,humidityMax float not null,\
-humidityMin float not null,illuminationMax float not null,illuminationMin float not null);";
- if(SQLITE_OK != sqlite3_exec(db,sql,NULL,NULL,&errmsg))//判断是否成功成功返回SQLITE_OK  
+	char *sql = "create table config_env(temperatureMax float not null,\
+	temperatureMin float not null,\
+	humidityMax float not null,\
+	humidityMin float not null,\
+	illuminationMax float not null,\
+	illuminationMin float not null);";
+	if(SQLITE_OK != sqlite3_exec(db,sql,NULL,NULL,&errmsg))//判断是否成功成功返回SQLITE_OK  
     {  
-        printf("config_env table fail:\n");  
+        printf("operate failed: %s\n",errmsg);
          
         return(-1);  
     }  
 	printf("create table config_env success.\n");
 }
-int creat_table_collect_env()
+int creat_table_collect_env(sqlite3 *db)
 {
-	sqlite3 *db;
+
 	char *errmsg=NULL;
     
 	char *sql="create table collect_env(stationID int,\
@@ -77,49 +71,34 @@ int creat_table_collect_env()
 	latitude varchar(20),\
 	longitude varchar(20),\
 	date timestamp not null default current_timestam);";
-	#if 0	
-	char *sql="create table collect_env(stationID int,\
-		stationName varchar(20),\
-		telephoneNum varchar(11),\
-		temperature float,\
-		username varchar(20),\
-		humidity float,\
-		illumination float,\
-		latitude varchar(20),\
-		longitude varchar(20),\
-		year int,\
-		month int,\
-		day int,\
-		minute int,\
-		second int);";
-    #endif
+	
 	if(SQLITE_OK != sqlite3_exec(db,sql,NULL,NULL,&errmsg))//判断是否成功成功返回SQLITE_OK  
     {  
-        printf("collect_env fail:\n");  
+        printf("operate failed: %s\n",errmsg); 
          
         return(-1);  
     }  
 	printf("create table collect_env success.\n");
 }
-int init_table_env()
+int init_table_env(sqlite3 *db)
 {
-	sqlite3 *db;
+	
 	
 	char *errmsg = NULL;
-	char *sql="insert into config_env(temperatureMax,temperatureMin,humidityMax,humidityMin,illuminationMax,illuminationMin) values (50,5,50,10,500,10);"; 
+	char *sql="insert into config_env(temperatureMax,temperatureMin,humidityMax,humidityMin,illuminationMax,illuminationMin) values (50.0,5.0,51.0,10.5,500.6,10.8);"; 
 	
 	if(SQLITE_OK != sqlite3_exec(db,sql,NULL,NULL,&errmsg))//判断是否成功成功返回SQLITE_OK  
     {  
-        printf("Init_table_env  error:\n");  
+       printf("operate failed: %s\n",errmsg); 
          
         return(-1);  
     }  
 	printf("Init_table_env ok:\n");
 	
 }
-int display_table_env()
+int display_table_env(sqlite3 *db)
 {
-	sqlite3 *db;
+
 	char **aresult=NULL;  
   
     int i=0;  
@@ -128,10 +107,10 @@ int display_table_env()
 	char *errmsg=NULL;  
 	
 	char *sql="select * from config_env;";
- #if 1
+
 	if(SQLITE_OK != sqlite3_get_table(db,sql,&aresult,&nrow,&ncol,&errmsg))//判断sqlite3_get_table是否运用成功，成功返回SQLITE_OK  
     {  
-        printf("fail:%s\n",errmsg);  
+        printf("operate failed: %s\n",errmsg);
         printf("\n");  
         return(-1);  
     }  
@@ -147,17 +126,9 @@ int display_table_env()
     }  
   
     sqlite3_free_table(aresult);//释放aresult   		
-    #endif
-  #if 0
-	 if (sqlite3_exec(db, sql,callback, NULL, &errmsg)!= SQLITE_OK)
-    {
-        printf("%s\n", errmsg);
-    }
-    else
-    {
-        printf("Select done!\n");
-    }
-    #endif	
+
+	
+	
 }
 
 int set_env(float val, Type_info no)
@@ -195,7 +166,7 @@ int set_env(float val, Type_info no)
 	}
 	if(SQLITE_OK != sqlite3_exec(db,sql,NULL,NULL,&errmsg))//判断是否成功成功返回SQLITE_OK  
     {  
-        printf("set_env  error:\n");  
+        printf("operate failed: %s\n",errmsg);
          
         return(-1);  
     }  
@@ -207,13 +178,26 @@ int set_env(float val, Type_info no)
 
 int main()
 {
-		
-	creat_database();
-	creat_table_config_env();
-	creat_table_collect_env();
-    init_table_env (); 
-    display_table_env();
-	//set_env(50.2,TEMPERATURE_MAX );
-	//display_table_env();
+	sqlite3 *db;
+	int rc=0;
+	rc=sqlite3_open(DATABASE,&db);
+	if (rc != SQLITE_OK)
+    {
+       printf ("Can't Open Database:%s!\n",sqlite3_errmsg(db));
+		 
+		sqlite3_close(db);
+    }
+    else
+    {
+        printf("database open success!\n");
+    }	
+	//creat_database(db);
+	creat_table_config_env(db);
+	creat_table_collect_env(db);
+    init_table_env (db); 
+    display_table_env(db);
+	//set_env(60.2,TEMPERATURE_MAX );
+	//display_table_env(db);
+	sqlite3_close(db);
     return 0;
 }
