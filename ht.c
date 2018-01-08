@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <sqlite3.h>
@@ -62,7 +61,7 @@ int creat_table_collect_env(sqlite3 *db)
 
 	char *errmsg=NULL;
     
-	char *sql="create table collect_env(stationID int,\
+	char *sql="create table collect_env(stationID varchar(20),\
 	stationName varchar(20),\
 	telephoneNum varchar(11),\
 	temperature float,\
@@ -71,7 +70,7 @@ int creat_table_collect_env(sqlite3 *db)
 	illumination float,\
 	latitude varchar(20),\
 	longitude varchar(20),\
-	date timestamp not null default current_timestam);";
+	sampletime varchar(25));";
 	
 	if(SQLITE_OK != sqlite3_exec(db,sql,NULL,NULL,&errmsg))//判断是否成功成功返回SQLITE_OK  
     {  
